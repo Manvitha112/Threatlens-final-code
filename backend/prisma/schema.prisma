@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  password     String
+  createdAt    DateTime @default(now())
+  repos        Repo[]
+}
+
+model Repo {
+  id            String    @id @default(uuid())
+  repoId        String    @unique
+  name          String
+  owner         String
+  defaultBranch String
+  status        String    @default("ACTIVE")
+  lastScannedAt DateTime?
+  userId        String
+  languages     String?
+  repoSize      Int?
+  fileCount     Int?
+  dependencies  String?
+  readmeSummary String?
+  contributors  String?
+  recentCommits String?
+  stars         Int?
+  forks         Int?
+  description   String?
+  user          User      @relation(fields: [userId], references: [id])
+  secrets       Secret[]
+  vulns         Vuln[]
+  createdAt     DateTime  @default(now())
+}
+
+model Secret {
+  id         String   @id @default(uuid())
+  repoId     String
+  repo       Repo     @relation(fields: [repoId], references: [id])
+  filePath   String
+  lineNumber Int
+  secretType String
+  severity   String
+  commitSha  String
+  status     String   @default("open")
+  risk       String?
+  fix        String?
+  createdAt  DateTime @default(now())
+}
+
+model Vuln {
+  id          String   @id @default(uuid())
+  repoId      String
+  repo        Repo     @relation(fields: [repoId], references: [id])
+  packageName String
+  version     String
+  cveId       String
+  severity    String
+  description String
+  fixVersion  String
+  advisoryUrl String
+  createdAt   DateTime @default(now())
+}
+
+model Alert {
+  id         String   @id @default(uuid())
+  type       String
+  message    String
+  status     String   @default("sent")
+  createdAt  DateTime @default(now())
+}
+model Allowlist {
+  id        String   @id @default(uuid())
+  repoId    String
+  filePath  String
+  secretType String
+  addedBy   String
+  reason    String?
+  createdAt DateTime @default(now())
+}
+model ScanHistory {
+  id            String   @id @default(uuid())
+  repoId        String
+  repoName      String
+  status        String
+  findingsCount Int      @default(0)
+  duration      Int      @default(0)
+  commitSha     String?
+  triggeredBy   String   @default("manual")
+  retryCount    Int      @default(0)
+  errorMessage  String?
+  createdAt     DateTime @default(now())
+}
+model SecurityEvent {
+  id          String   @id @default(uuid())
+  repoId      String
+  repoName    String
+  eventType   String
+  severity    String
+  title       String
+  description String
+  commitSha   String?
+  filePath    String?
+  lineNumber  Int?
+  author      String?
+  status      String   @default("open")
+  resolvedAt  DateTime?
+  createdAt   DateTime @default(now())
+}

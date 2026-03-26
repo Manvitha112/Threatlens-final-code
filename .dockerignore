@@ -1,0 +1,41 @@
+# Node modules
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Build artifacts
+dist/
+build/
+
+# Dependencies lock files in Docker (use ci instead)
+package-lock.json.bak
+yarn.lock.bak
+
+# Git
+.git/
+.gitignore
+
+# Tests
+coverage/
+.nyc_output/
+
+# OS
+Thumbs.db
+.DS_Store

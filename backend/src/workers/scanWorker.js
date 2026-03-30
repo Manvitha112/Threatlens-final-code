@@ -6,6 +6,16 @@ require('dotenv').config()
 
 const prisma = new PrismaClient()
 
+const getRedisConnection = () => {
+  if (process.env.REDIS_URL) {
+    return { url: process.env.REDIS_URL }
+  }
+  return {
+    host: process.env.REDIS_HOST || '127.0.0.1',
+    port: parseInt(process.env.REDIS_PORT) || 6379
+  }
+}
+
 const githubGetDiff = async (url, token) => {
   const res = await axios.get(url, {
     headers: {
@@ -94,9 +104,7 @@ const worker = new Worker('scanQueue', async (job) => {
   console.log(`[ScanWorker] Done. ${findings.length} findings saved.`)
 
 }, {
-  connection: { host: '127.0.0.1', port: 6379 },
-  attempts: 3,
-  backoff: { type: 'exponential', delay: 2000 }
+  connection: getRedisConnection()
 })
 
 worker.on('completed', job => {
@@ -111,4 +119,4 @@ worker.on('error', err => {
   console.error(`[ScanWorker] Worker error: ${err.message}`)
 })
 
-console.log('[ScanWorker] Worker started, listening for jobs on "scanQueue"...')
+console.log('[ScanWorker] Worker started, listening on "scanQueue"...')

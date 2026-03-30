@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: process.env.NODE_ENV === 'production'
-    ? 'https://threatlens-backend.onrender.com/api'
+    ? 'https://threatlens-backend-6f02.onrender.com/api'
     : 'http://localhost:5000/api'
 });
 
@@ -21,12 +21,9 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      console.warn('[API Client] Unauthorized (401) - Redirecting to login');
       localStorage.removeItem('threatlens_token');
       localStorage.removeItem('threatlens_user');
       window.location.href = '/login';
